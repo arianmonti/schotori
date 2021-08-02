@@ -20,10 +20,10 @@ func index(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	conn, _ := sql.Open("postgres", fmt.Sprintf("user=%s password=%s dbname=%s sslmode=%s",
-		config.DBUser,
-		config.DBPasswd,
-		config.DBName,
-		config.SSLMode,
+		config.Cfg.DBUser,
+		config.Cfg.DBPasswd,
+		config.Cfg.DBName,
+		config.Cfg.DBSSLMode,
 	))
 
 	if err := conn.Ping(); err != nil {
@@ -37,7 +37,7 @@ func main() {
 	multiLogger := io.MultiWriter(os.Stdout, file)
 	logged := handlers.LoggingHandler(multiLogger, mux)
 	server := &http.Server{
-		Addr:         config.HTTPAddr,
+		Addr:         config.Cfg.HTTPAddr,
 		Handler:      logged,
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 10 * time.Second,

@@ -1,25 +1,25 @@
 package config
 
 import (
-	"os"
-
 	"github.com/joho/godotenv"
+	"github.com/kelseyhightower/envconfig"
 )
 
-func get(variable string, defaultVar string) string {
-	godotenv.Load()
-	envar := os.Getenv(variable)
-	if envar == "" {
-		return defaultVar
-	}
-	return envar
+type Config struct {
+	DBUser    string `envconfig:"SCHOTORI_DATABASE_USER" default:"root"`
+	DBHost    string `envconfig:"SCHOTORI_DATABASE_HOST" default:"localhost"`
+	DBPasswd  string `envconfig:"SCHOTORI_DATABAE_PASSWORD" default:"root"`
+	DBName    string `envconfig:"SCHOTORI_DATABASE_NAME" default:"schotori"`
+	DBSSLMode string `envconfig:"SCHOTORI_DATABSE_SSLMODE" default:"disable"`
+	HTTPAddr  string `envconfig:"SCHOTORI_HTTP_ADDR" default:"127.0.0.1:5000"`
 }
 
-var (
-	DBUser   = get("SCHOTORI_DATABASE_USER", "root")
-	DBHost   = get("SCHOTORI_DATABASE_HOST", "localhost")
-	DBPasswd = get("SCHOTORI_DATABAE_PASSWORD", "root")
-	DBName   = get("SCHOTORI_DATABASE_NAME", "schotori")
-	SSLMode  = get("SCHOTORI_DATABSE_SSLMODE", "disable")
-	HTTPAddr = get("SCHOTORI_HTTP_ADDR", "127.0.0.1:5000")
-)
+var Cfg Config
+
+func init() {
+	godotenv.Load()
+	err := envconfig.Process("", &Cfg)
+	if err != nil {
+		panic(err)
+	}
+}
