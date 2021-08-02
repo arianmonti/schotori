@@ -1,12 +1,17 @@
 package main
 
 import (
+	"database/sql"
+	"fmt"
 	"io"
 	"net/http"
 	"os"
 	"time"
 
+	"schotori/config"
+
 	"github.com/gorilla/handlers"
+	_ "github.com/lib/pq"
 )
 
 func index(w http.ResponseWriter, r *http.Request) {
@@ -14,6 +19,17 @@ func index(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	conn, _ := sql.Open("postgres", fmt.Sprintf("user=%s password=%s dbname=%s sslmode=%s",
+		config.DBUser,
+		config.DBPasswd,
+		config.DBName,
+		config.SSLMode,
+	))
+
+	if err := conn.Ping(); err != nil {
+		panic(err)
+	}
+
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", index)
 
@@ -21,7 +37,7 @@ func main() {
 	multiLogger := io.MultiWriter(os.Stdout, file)
 	logged := handlers.LoggingHandler(multiLogger, mux)
 	server := &http.Server{
-		Addr:         "127.0.0.1:5000",
+		Addr:         config.HTTPAddr,
 		Handler:      logged,
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 10 * time.Second,

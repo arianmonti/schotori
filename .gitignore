@@ -192,3 +192,4 @@ tags
 .ionide
 
 server.log
+.env
